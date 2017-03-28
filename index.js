@@ -40,11 +40,15 @@ KoaWebSocketServer.prototype.use = function (fn) {
   return this;
 };
 
-module.exports = function (app) {
+module.exports = function (app, server) {
   const oldListen = app.listen;
   app.listen = function () {
     debug('Attaching server...');
-    app.server = oldListen.apply(app, arguments);
+    if(server){
+      app.server = server.listen.apply(server, arguments);
+    }else{
+      app.server = oldListen.apply(app, arguments);
+    }
     app.ws.listen(app.server);
     return app.server;
   };
